@@ -1,0 +1,7 @@
+/build/
+release/
+/test/unit/coverage/
+node_modules/
+/*.js
+__test__
+static

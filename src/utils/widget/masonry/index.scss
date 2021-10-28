@@ -1,0 +1,28 @@
+* {
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+img {
+    display: block;
+    width: 335px;
+}
+
+.item {
+    box-shadow: 2px 2px 2px #999999;
+    position: absolute;
+}
+
+.masonry-contianer {
+    display: flex;
+    justify-content: center;
+
+    .masonry-content {
+        padding: 0 8px;
+
+        .item-container {
+            padding:  8px;
+        }
+    }
+}

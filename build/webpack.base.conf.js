@@ -6,7 +6,10 @@ const chalk = require('chalk')
 const fs = require('fs')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
+const VConsolePlugin = require('vconsole-webpack-plugin')
 const webpack = require('webpack')
+// TODO: V5.4 升级 node 插件需要自己引入，webpack不再统一引入了
+const process = require('process')
 // 引入项目文件属性
 const utils = require('./utils')
 // const config = require('../config')
@@ -15,6 +18,15 @@ const projectConfig = require('./project.config')
 
 // 初始化 node Env
 utils.initNodeEnv()
+
+// 条件编译处理
+// const conditionalCompiler = {
+//     loader: 'js-conditional-compile-loader',
+//     options: {
+//         ISVUE: process.env.VUE_APP_BUILD_ENV, // VUE 项目
+//         ISREACT: process.env.REACT_APP_BUILD_ENV // REACT 项目
+//     }
+// }
 
 let entryPath = {}
 let HTMLPlugin = []
@@ -29,10 +41,14 @@ if (projectName.name) {
             title: projectConfig.fileName + 'page',
             // filename: projectConfig.fileName + '.html',
             filename: 'index.html',
+            hash: false,
+            inject: true,
             minify: {
-                html5: true,
-            },
-            hash: false
+                removeComments: true,
+                collapseWhitespace: true
+                // more options:
+                // https://github.com/kangax/html-minifier#options-quick-reference
+            }
         })
     ]
 } else {
@@ -45,94 +61,118 @@ if (projectName.name) {
                 new HtmlWebpackPlugin({
                     template: element.template + 'index.html',
                     title: element.fileName + ' page',
-                    // filename: element.fileName + '/index.html',
+                    // filename: element.fileName + '.html',
                     filename: (process.env.VUE_APP_BUILD_ENV === 'staging' ? element.fileName + '-pre' : element.fileName) + '/index.html',
-                    minify: {   // html 文件的 压缩配置
-                        html5: true,
+                    // chunks: [ 'vendors', element.fileName ],
+                    inject: true,
+                    minify: {
+                        removeComments: true,
+                        collapseWhitespace: true
+                        // more options:
+                        // https://github.com/kangax/html-minifier#options-quick-reference
                     },
-                    hash: false,
-                    chunks: [ element.fileName, 'vendor' ],
-                    inject: true
+                    hash: false
                 })
             )
         }
     }
 }
 
-// 基础 plugins
-let basePlugin = [
-    new ProgressBarPlugin({
-        format: chalk.blue.bold('  构建中 [:bar] ') + chalk.green.bold(':percent') + ' (:elapsed seconds)',
-        clear: false,
-        width: 70
-    }),
-    new webpack.DefinePlugin({
-        // 'process.env': config.dev.env,
-        'process.env.VUE_APP_BUILD_ENV': JSON.stringify(process.env.VUE_APP_BUILD_ENV)
-    }),
-    new VueLoaderPlugin(),
-]
-
-let allPlugin = [].concat(HTMLPlugin, basePlugin)
-
-const webpackBaseConf = {
-    entry: entryPath,
-    module: {
+// 模块
+const moduleConfig = () => {
+    let modules = {
         rules: [
             {
-                test: /\.js$/,
-                exclude: file => (
-                    /node_modules/.test(file) &&
-                    !/\.vue\.js/.test(file)
-                ),
-                include: path.resolve(__dirname, 'src'),
-                loader: 'babel-loader'
+                test: /\.(js|jsx|ts|tsx)$/,
+                // exclude: file => (
+                //     /node_modules/.test(file) &&
+                //     !/\.vue\.js/.test(file)
+                // ),
+                exclude: /node_modules/,
+                include: [
+                    /src\/app/,
+                    /src\/server/,
+                    /src\/services/,
+                    /src\/utils/,
+                ],
+                // include: file => {
+                //     console.log(file)
+                //     return /app/.test(file)
+                // },
+                use: [
+                    'babel-loader',
+                    // conditionalCompiler
+                    { // 条件编译处理
+                        loader: 'webpack-preprocessor-loader',
+                        options: {
+                            params: {
+                                isVue: true,
+                                isReact: false
+                            }
+                        },
+                    }
+                ]
             },
             {
                 test: /\.vue$/,
-                loader: 'vue-loader',
-                options: {
-                    // 去除模板中的空格
-                    preserveWhitespace: false,
-                    // postcss配置,把vue文件中的样式部分,做后续处理
-                    // postcss: {
-                    //     options: {postcss, parser: 'postcss-scss'}
-                    // },
-                	loaders: [
-                        'style-loader',
-                        {
-                            loader: 'css-loader',
-                            options: {
-                                modules: true
-                            }
-                        },
-                        {
-                            loader: 'sass-loader',
-                            options: {
-                                sourceMap: true
-                            }
+                use: [
+                    {
+                        loader: 'vue-loader',
+                        options: {
+                            // 去除模板中的空格
+                            preserveWhitespace: false,
+                            // postcss配置,把vue文件中的样式部分,做后续处理
+                            // postcss: {
+                            //     options: {postcss, parser: 'postcss-scss'}
+                            // },
+                            loaders: [
+                                'style-loader',
+                                {
+                                    loader: 'css-loader',
+                                    options: {
+                                        modules: true
+                                    }
+                                },
+                                {
+                                    loader: 'sass-loader',
+                                    options: {
+                                        sourceMap: true
+                                    }
+                                }
+                            ]
                         }
-                    ]
-                }
+                    },
+                    // conditionalCompiler
+                ]
             },
             {
                 test: /\.(png|svg|jpg|gif)$/,
-                use: [
-                    {
-                        loader: 'file-loader',
-                        options: {
-                            name: '[hash:8]-[name].[ext]',
-                            outputPath: 'img/',   //输出图片放置的位置
-                            publicPath: projectName.name ? './img' : '../img', //html的img标签src所指向图片的位置，与outputPath一致
-                            limit: 4000,
-                            esModule: false
-                        }
-                    }
-                ]
+                type: 'asset/resource',
+                generator: {
+                    filename: 'images/[hash][ext][query]'
+                }
+            },
+            {
+                test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+                exclude: /node_modules/,
+                include: [
+                    /src\/app/,
+                    /src\/base/,
+                ],
+                type: 'asset/resource',
+                generator: {
+                    filename: 'fonts/[hash][ext][query]'
+                }
             }
         ]
-    },
-    resolve: {
+    }
+
+    return modules
+}
+
+// 解析
+const resolveConfig = () => {
+    let resolve = {
         modules: [
             'node_modules',
             // path.resolve(__dirname, '../src')
@@ -142,10 +182,49 @@ const webpackBaseConf = {
         alias: {
             '@plugins': path.resolve('src/plugins'),
             '@config': path.resolve('config'),
-            '@': path.resolve('src/app')
+            '@': path.resolve('src/app'),
+            '@utils': path.resolve('src/utils'),
+            '@base': path.resolve('src/base')
         }
-    },
-    plugins: allPlugin
+    }
+
+    return resolve
+}
+
+// plugins
+const pluginsConfig = () => {
+    let basePlugin = [
+        new ProgressBarPlugin({
+            format: chalk.blue.bold('  构建中 [:bar] ') + chalk.green.bold(':percent') + ' (:elapsed seconds)',
+            clear: false,
+            width: 100
+        }),
+        new webpack.DefinePlugin({
+            // 'process.env': config.dev.env,
+            'process.env.VUE_APP_BUILD_ENV': JSON.stringify(process.env.VUE_APP_BUILD_ENV)
+        }),
+        new VueLoaderPlugin(),
+        new VConsolePlugin({
+            // 需要郭略的入口文件
+            filter: [],
+            // 发布代码前记得改回 false
+            enable: (process.env.NODE_ENV === 'production' && process.env.VUE_APP_BUILD_ENV === 'prod') ? false : true
+        })
+    ]
+
+    let allPlugin = [].concat(HTMLPlugin, basePlugin)
+    return allPlugin
+}
+
+const webpackBaseConf = {
+    entry: entryPath,
+    module: moduleConfig(),
+    resolve: resolveConfig(),
+    plugins: pluginsConfig(),
+    cache: {
+        type: 'filesystem',
+        allowCollectingMemory: true,
+    }
 }
 
 // 将项目名写入到系统中

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0,viewport-fit=cover" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <link rel="icon" href="//www.jd.com/favicon.ico" type="image/x-icon" />
+    <!-- 金融 sdk -->
+    <!-- <script src="//m.jr.jd.com/common/jssdk/jrbridge/2.0.9/jrbridge.js"></script> -->
+    <!-- 商城 sdk -->
+    <!-- <script src="//storage.360buyimg.com/js-jdd/jd-jssdk.min.js"></script> -->
+    <!--SGM监控-->
+    <!-- TODO：sid appKey 需要修改 -->
+    <script crossorigin src="https://sgm-static.jd.com/sgm-2.6.6.js" name="SGMH5" sid="0198b77e251f43629745a187a60bcbf1" appKey="btfront.jd.com" ></script>
+    <!-- 页面名称 -->
+    <title></title>
+    <!-- 奇点接入脚本 -->
+    <!-- TODO：sid userId 需要修改 -->
+    <!--奇点配置项设置-->
+    <script>
+        (function () {
+            var _ = window;
+            window.__qd__ = window.__qd__ || {};
+            window.__qd__.config = window.__qd__.config || {
+                sid: 'IW6NE',
+                ext: function () {
+                    // 根据实际需要，设置要上报的全局扩展参数
+                    return {
+                        yxfk: 'tiantianlinghongbao*APP增长部天天领红包*1'
+                    };
+                }
+            };
+        })();
+    </script>
+    <!-- 奇点 JS SDK -->
+    <script async name="qidian-sdk" crossorigin="anonymous" src="//qdsdk.jd.com/2.0.0/qd.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+</body>
+
+<!-- 设备指纹开始 -->
+<script language="JavaScript">
+    // pin在script文件之前，pc端在*.jd.com域下无需添加，自动从cookie中获取，移动端必须传，如果pin被其他代码使用，可以使用jd_jr_td_risk_pin变量
+    var pin = "服务器端加密以后的pin";
+</script>
+<script src="//gia.jd.com/m.html"></script>    <!-- 注意：域名是 gia -->
+<script src="//gias.jd.com/js/m.js"></script>  <!-- 注意：域名是 gias -->
+</html>

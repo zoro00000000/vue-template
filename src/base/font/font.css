@@ -1,0 +1,53 @@
+@charset "UTF-8";
+@font-face {
+    font-family: "UDC1.04-Bold";
+    src: url("./UDC1.04-Bold.otf") format("opentype");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "UDC1.04-light";
+    src: url("./UDC1.04-light.otf") format("opentype");
+    /* iOS 4.1- */
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "UDC1.04-Mediun";
+    src: url("./UDC1.04-Mediun.otf") format("opentype");
+    /* iOS 4.1- */
+    font-style: normal;
+    font-weight: normal;
+}
+/* @font-face{
+    font-family: "SanFDB";
+    src: url('./SanFranciscoDisplay-Bold-4.woff') format('woff'),
+        url('./SanFranciscoDisplay-Bold-4.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+} */
+
+/* .f-SanFDB{
+    font-family: "SanFDB" !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+} */
+.f-udc-bold {
+    font-family: "UDC1.04-Bold" !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale; 
+}
+
+.f-udc-light {
+    font-family: "UDC1.04-light" !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.f-udc-medium {
+    font-family: "UDC1.04-Mediun" !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

@@ -1,16 +1,11 @@
-/*
- * @Date: 2020-02-24 10:44:00
- * @LastEditors:    haoliang
- * @LastEditTime:   2020-02-24
- */
-
 const path = require('path')
 
 module.exports = {
     // 生产环境配置
     build: {
         mode: 'production',
-        devtool: 'source-map',
+        // ! 根据项目情况而定
+        // devtool: 'source-map',
         minimize: true,
         concatenateModules: true,
         // 性能提示
@@ -20,13 +15,13 @@ module.exports = {
         // 单个资源体积
         maxAssetSize: 100000,
         // 是否开启 Gzip
-        productionGzip: true,
-        assetsPublicPath: '../'
+        productionGzip: false,
+        assetsPublicPath: ''
     },
     // 开发环境 配置项
     dev: {
         mode: 'development',
-        devtool: 'cheap-module-eval-source-map',
+        devtool: 'eval-cheap-module-source-map',
         optimization: {
             removeAvailableModules: false,
             removeEmptyChunks: false,
@@ -35,21 +30,18 @@ module.exports = {
         // devServer 配置
         useLocalIp: false,
         // host: '0.0.0.0',
-        host: 'dev.jd.com',
-        port: 8080,
+        host: 'dev.vue.component.com',
+        port: 80,
         contentBase: path.resolve(__dirname, '../public'),
         compress: true,
         hot: true,
         https: false,
-        open: true,
+        // open: true,
+        open: 'Google Chrome',
         noInfo: true,
         inline: true,
-        overlay: {
-            warnings: true,
-            errors: true
-        },
         watchContentBase: true,
-        allowedHosts: ['.jd.com'],
+        // allowedHosts: ['.jd.com'],
         proxy: {
             // '/gw/generic/bt/h5/m/*': {
             //     target: 'mstest.jr.jd.com',
@@ -68,6 +60,10 @@ module.exports = {
             //         })
             //     },
             // },   
-        }
+        },
+        // V4 新增
+        logging: 'none',
+        overlay: true,
+        progress: true
     }
 }

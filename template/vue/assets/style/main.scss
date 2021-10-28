@@ -1,0 +1,17 @@
+/* 全局样式，自适应配置 */
+
+html {
+    font-size: calc(100vw / 10);
+    -webkit-overflow-scrolling: touch;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+button {
+    border: none;
+    outline: none;
+}

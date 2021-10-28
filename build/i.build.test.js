@@ -8,4 +8,3 @@ utils.consoleFun()
 utils.modifyProjectName()
 
 let exec = child_process.execSync
-exec('npm run build:test', {stdio: 'inherit'})
